@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>This Page Knows...</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:black;
+  color:white;
+  text-align:center;
+  overflow:hidden;
+}
+
+section{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  padding:20px;
+}
+
+input{
+  padding:10px;
+  border-radius:10px;
+  border:none;
+  width:220px;
+  text-align:center;
+  font-size:16px;
+}
+
+button{
+  padding:10px 25px;
+  background:crimson;
+  border:none;
+  color:white;
+  border-radius:25px;
+  cursor:pointer;
+  margin-top:20px;
+}
+
+.hidden{display:none;}
+
+.fade{animation:fadeIn 1s forwards;}
+@keyframes fadeIn{
+  from{opacity:0; transform:translateY(20px);}
+  to{opacity:1; transform:translateY(0);}
+}
+
+/* Shake */
+.shake{animation:shake 0.4s;}
+@keyframes shake{
+  0%{transform:translateX(0);}
+  25%{transform:translateX(-5px);}
+  50%{transform:translateX(5px);}
+  75%{transform:translateX(-5px);}
+  100%{transform:translateX(0);}
+}
+
+/* Heart Rain */
+.heart{
+  position:fixed;
+  top:-10px;
+  color:red;
+  animation:fall 5s linear infinite;
+}
+@keyframes fall{
+  to{transform:translateY(100vh);}
+}
+
+/* Love Meter */
+#loveBar{
+  width:0%;
+  height:20px;
+  background:crimson;
+  margin-top:20px;
+  border-radius:20px;
+  transition:width 0.3s;
+}
+
+.story p{
+  margin:25px 0;
+  opacity:0;
+  animation:fadeStory 2s forwards;
+}
+.story p:nth-child(1){animation-delay:1s;}
+.story p:nth-child(2){animation-delay:3s;}
+.story p:nth-child(3){animation-delay:5s;}
+
+@keyframes fadeStory{
+  to{opacity:1;}
+}
+
+.final{color:#ff4d6d;}
+</style>
+</head>
+
+<body>
+
+<audio id="bgMusic" loop>
+  <source src="YOU.mp3" type="audio/mpeg">
+</audio>
+
+<!-- NAME GAME -->
+<section id="nameGame">
+  <h1>This page knows who you're thinking about...</h1>
+  <input type="text" id="nameInput" placeholder="Enter name...">
+  <button onclick="unlock()">Unlock</button>
+</section>
+
+<!-- SECRET PAGE -->
+<section id="secretPage" class="hidden">
+  <h1 id="typeText"></h1>
+  <div style="width:200px;background:#333;border-radius:20px;">
+    <div id="loveBar"></div>
+  </div>
+  <button onclick="showTimeline()">Continue</button>
+</section>
+
+<!-- TIMELINE -->
+<section id="timeline" class="hidden">
+  <h2>Timeline of a Silent Love</h2>
+  <div class="story">
+    <p id="line1"></p>
+    <p id="line2"></p>
+    <p id="line3"></p>
+    <p class="final">Some stories don't need confession.</p>
+  </div>
+</section>
+
+<script>
+let enteredName="";
+
+function unlock(){
+  const input=document.getElementById("nameInput").value.trim();
+  if(input===""){
+    alert("Enter a name ❤️");
+    return;
+  }
+
+  enteredName=input;
+  document.body.classList.add("shake");
+
+  setTimeout(()=>{
+    document.body.classList.remove("shake");
+    document.getElementById("nameGame").classList.add("hidden");
+    document.getElementById("secretPage").classList.remove("hidden");
+    typeWriter(enteredName+" was chosen silently. 💖");
+    startLoveMeter();
+    heartRain();
+  },500);
+}
+
+function typeWriter(text){
+  let i=0;
+  const speed=50;
+  document.getElementById("typeText").innerHTML="";
+  function typing(){
+    if(i<text.length){
+      document.getElementById("typeText").innerHTML+=text.charAt(i);
+      i++;
+      setTimeout(typing,speed);
+    }
+  }
+  typing();
+}
+
+function startLoveMeter(){
+  let width=0;
+  const bar=document.getElementById("loveBar");
+  const interval=setInterval(()=>{
+    if(width>=100){
+      clearInterval(interval);
+    }else{
+      width++;
+      bar.style.width=width+"%";
+    }
+  },30);
+}
+
+function showTimeline(){
+  document.getElementById("secretPage").classList.add("hidden");
+  document.getElementById("timeline").classList.remove("hidden");
+  document.getElementById("line1").innerHTML="The day I noticed "+enteredName+".";
+  document.getElementById("line2").innerHTML="The day I smiled because of "+enteredName+".";
+  document.getElementById("line3").innerHTML="The day I stayed silent about "+enteredName+".";
+}
+
+function heartRain(){
+  setInterval(()=>{
+    const heart=document.createElement("div");
+    heart.classList.add("heart");
+    heart.style.left=Math.random()*100+"vw";
+    heart.innerHTML="❤️";
+    heart.style.fontSize=(Math.random()*20+10)+"px";
+    document.body.appendChild(heart);
+    setTimeout(()=>heart.remove(),5000);
+  },300);
+}
+
+/* Auto play on first tap */
+document.addEventListener("click",function(){
+  document.getElementById("bgMusic").play();
+},{once:true});
+</script>
+
+</body>
+</html>
